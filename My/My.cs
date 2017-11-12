@@ -37,12 +37,14 @@ public static partial class My
 {
     #region Properties
     public static Char DecimalSeparator { get; set; } = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator[0];
-    public static string Version { get; set; } = " V" + System.Windows.Forms.Application.ProductVersion.Substring(0, 5);//V226
-    private static string ExeFullFile { get; set; } = System.Windows.Forms.Application.ExecutablePath;
+    public static string Version { get; set; } = " V" + Application.ProductVersion.Substring(0, 5);//V226
+    private static string ExeFullFile { get; set; } = Application.ExecutablePath;
     public static string ExePath { get; set; } = Path.GetDirectoryName(ExeFullFile) + "\\";
     public static string ExeFile { get; set; } = ExePath + Path.GetFileNameWithoutExtension(ExeFullFile);
     public static string Drive { get; set; } = Path.GetPathRoot(ExePath);
-    public static string ProcessName { get; set; } = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+    public static string ProcessName { get; set; } = Process.GetCurrentProcess().ProcessName;
+
+    public static string UserName { get; set; } = Environment.UserName;
     public static string IPAddress
     {
         get
