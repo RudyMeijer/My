@@ -49,5 +49,21 @@ namespace UnitTests
         {
             My.ReadIniFile("ForensicLab.ini");
         }
+        [TestMethod]
+        public void ReadWriteFile()
+        {
+            My.WriteToFile(fileName: "test.txt", msg: "this is a test");
+            var msg = My.ReadFromFile("test.txt");
+            Debug.WriteLine($"ReadWriteFile: { msg}");
+            Assert.IsTrue(msg== "this is a test",$"msg = {msg}");
+        }
+    }
+    [TestClass]
+    public class TestW32
+    {
+        [TestMethod]
+        public void MethodeName()
+        {
+        }
     }
 }
