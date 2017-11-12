@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace UnitTests
 {
     [TestClass]
-    public class TestMy
+    public class MyTest
     {
         [TestMethod]
         //
@@ -52,10 +53,26 @@ namespace UnitTests
         [TestMethod]
         public void ReadWriteFile()
         {
-            My.WriteToFile(fileName: "test.txt", msg: "this is a test");
+            My.WriteToFile("test.txt", "Hello world");
             var msg = My.ReadFromFile("test.txt");
             Debug.WriteLine($"ReadWriteFile: { msg}");
-            Assert.IsTrue(msg== "this is a test",$"msg = {msg}");
+            Assert.IsTrue(msg == "Hello world", $"msg = {msg}");
+        }
+        [TestMethod]
+        public void GenerateKey()
+        {
+            var license = My.GenerateLicenseKeyx64(My.Pin);
+            Assert.IsTrue(license == "A5E12D0F", $"Invalid licenseKey {license }"); // Laptop Marga
+        }
+        [TestMethod]
+        public void MethodeTests()
+        {
+            var r = My.BeautySize(1235000);
+            Assert.IsTrue(r == "1,24 MB", $"BeautySize = " + r);
+
+            Assert.IsTrue(My.SetAttribute("test.txt", FileAttributes.ReadOnly), $"MySetAttribute is false");
+            Assert.IsTrue(My.IsSetAttribute(new FileInfo("test.txt"), FileAttributes.Archive), $"MyIsSetAttribute is false");
+            Assert.IsTrue(My.ResetAttribute("test.txt", FileAttributes.ReadOnly), $"MyResetAttribute is false");
         }
     }
     [TestClass]

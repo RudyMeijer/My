@@ -41,9 +41,9 @@ public static partial class My
     private static string ExeFullFile { get; set; } = System.Windows.Forms.Application.ExecutablePath;
     public static string ExePath { get; set; } = Path.GetDirectoryName(ExeFullFile) + "\\";
     public static string ExeFile { get; set; } = ExePath + Path.GetFileNameWithoutExtension(ExeFullFile);
-    public static string Drive { get; set; }   = Path.GetPathRoot(ExePath);
+    public static string Drive { get; set; } = Path.GetPathRoot(ExePath);
     public static string ProcessName { get; set; } = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
-    public static string IPAddress 
+    public static string IPAddress
     {
         get
         {
@@ -203,7 +203,7 @@ public static partial class My
         }
         return result.ToString();
     }
-    public static string GetPin(string drive)
+    private static string GetPin(string drive)
     {
         uint v = 103; //V103
         uint sn = v + VolumeSerialNumber(drive);
@@ -287,7 +287,7 @@ public static partial class My
     //
     public static void Status(string format, params object[] args)
     {
-        if(args.Length > 0) //V230
+        if(args.Length > 0)
         {
             status(string.Format(format, args));
         }
@@ -299,11 +299,9 @@ public static partial class My
     private static ToolStripStatusLabel thistoolStripStatusLabel1;
     private static void status(string msg)
     {
-        //V232 if (!msg.StartsWith(" ") && thistoolStripStatusLabel1.Text.StartsWith("Error")) return;//V102
         thistoolStripStatusLabel1.Text = msg;
         if(thistoolStripStatusLabel1.Text.StartsWith("Error")) My.Log(msg);
-        if(msg.StartsWith(" "))
-            Application.DoEvents(); //V229 
+        if(msg.StartsWith(" ")) Application.DoEvents();
     }
 
     public static void SetStatus(ToolStripStatusLabel toolStripStatusLabel1)
@@ -316,37 +314,39 @@ public static partial class My
     {
         return (fi.Attributes & fileAttribute) == fileAttribute;
     }
-    public static void SetAttribute(string filename, FileAttributes fileAttribute)
+    public static bool SetAttribute(string filename, FileAttributes fileAttribute)
     {
         try
         {
             FileInfo fi = new FileInfo(filename);
-            if(!fi.Exists) return;
+            if(!fi.Exists) return false;
             fi.Attributes |= fileAttribute;
-
+            return true;
         }
         catch(Exception e)
         {
             My.Log("SetAttribute: {0} {1}", e.Message, filename);
         }
+        return false;
     }
-    public static void ResetAttribute(string filename, FileAttributes fileAttribute)
+    public static bool ResetAttribute(string filename, FileAttributes fileAttribute)
     {
         try
         {
             FileInfo fi = new FileInfo(filename);
-            if(!fi.Exists) return;
+            if(!fi.Exists) return false;
             fi.Attributes &= ~fileAttribute;
-
+            return true;
         }
         catch(Exception e)
         {
             My.Log("ResetAttribute: {0} {1}", e.Message, filename);
         }
+        return false;
     }
     public static double Val(string s) //V224
     {
-        if(!double.TryParse(s,  out double result))
+        if(!double.TryParse(s, out double result))
         {
             // Get unit.
             long u = Units(s.ToUpper());
@@ -366,7 +366,7 @@ public static partial class My
         for(int i = 0; i < s.Length; i++)
         {
             char c = s[i];
-            if(((c >= '0') && (c <= '9')) || c==DecimalSeparator)
+            if(((c >= '0') && (c <= '9')) || c == DecimalSeparator)
             {
                 if(!blnInNumber)
                 {
@@ -411,7 +411,7 @@ public static partial class My
     {
         string[] units = new string[] { " Bytes", " KB", " MB", " GB" };
         int i = 0;
-        while(totalBytes > 1000)
+        while(totalBytes >= 1000)
         {
             i++;
             totalBytes /= 1000;
