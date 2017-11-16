@@ -50,7 +50,7 @@ public static partial class My
         get
         {
             string ip;
-            using(WebClient wc = new WebClient())
+            using (WebClient wc = new WebClient())
             {
                 ip = wc.DownloadString(new Uri("http://bot.whatismyipaddress.com"));
             }
@@ -68,18 +68,18 @@ public static partial class My
     #region private methodes
     private static void DownloadStringCallback2(Object sender, DownloadStringCompletedEventArgs e)
     {
-        if(e.Error == null)
+        if (e.Error == null)
         {
             Console.WriteLine(e.Result);
             int result;
-            if((result = ExecutionAllowed(e.Result)) > 0)
+            if ((result = ExecutionAllowed(e.Result)) > 0)
             {
                 MessageBox.Show("Sorry License expired. reason: " + result.ToString(), "Rudy Meijer.");
-                if(!File.Exists(My.iniFile)) My.WriteToFile(My.iniFile, "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\r\n<Screen width=\"245\" height=\"162\" />");
+                if (!File.Exists(My.iniFile)) My.WriteToFile(My.iniFile, "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\r\n<Screen width=\"245\" height=\"162\" />");
                 Application.Exit(); // Windows application.
                 Environment.Exit(0); // Console application.
             }
-            else if(File.Exists(My.iniFile)) //V214
+            else if (File.Exists(My.iniFile)) //V214
             {
                 File.Delete(My.iniFile);
             }
@@ -87,7 +87,7 @@ public static partial class My
             //
             // Update statcounter statistics.
             //
-            using(WebClient wc = new WebClient())
+            using (WebClient wc = new WebClient())
             {
                 wc.Headers.Add("user-agent", "Mozilla " + My.Version + " (compatible; Rudy ; Windows NT 5.2; .NET CLR 1.0.3705;)");
                 wc.DownloadStringAsync(new Uri(urlStatCounter)); // "http://c37.statcounter.com/3320106/0/23c12e3e/0/"
@@ -102,12 +102,12 @@ public static partial class My
         //
         // read each line of inifile.
         //
-        foreach(string line in Regex.Split(iniFile, "\r\n"))
+        foreach (string line in Regex.Split(iniFile, "\r\n"))
         {
-            if(line.StartsWith("//")) continue;                            // Skip comment lines.
-            if(line.StartsWith("http:")) urlStatCounter = line;	        // return url of StatCounter.
-            if(line.StartsWith("deny ") && IsThisClient(line)) return 1;	    // deny.
-            if(line.StartsWith("msg ") && IsThisClient(line))
+            if (line.StartsWith("//")) continue;                            // Skip comment lines.
+            if (line.StartsWith("http:")) urlStatCounter = line;	        // return url of StatCounter.
+            if (line.StartsWith("deny ") && IsThisClient(line)) return 1;	    // deny.
+            if (line.StartsWith("msg ") && IsThisClient(line))
                 MessageBox.Show(line.Substring(1 + line.IndexOf(' ', 4)), "Rudy Meijer says:");          // V219 Show a message on client computer.
         }
         return 0;                                                               // Execution is allowed.
@@ -133,10 +133,10 @@ public static partial class My
     {
         string word2 = GetWord(2, line);
         string version = GetWord(3, line);
-        if(word2.EndsWith("*")) word2 = word2.Remove(word2.Length - 1);
-        if(word2 == "all") return true;
-        if(My.Version.Trim() == version) return true; //V226
-        if(My.IPAddress.StartsWith(word2)) return true;
+        if (word2.EndsWith("*")) word2 = word2.Remove(word2.Length - 1);
+        if (word2 == "all") return true;
+        if (My.Version.Trim() == version) return true; //V226
+        if (My.IPAddress.StartsWith(word2)) return true;
         return false;
     }
     private static string GetWord(int wordNr, string line)
@@ -147,7 +147,7 @@ public static partial class My
     #endregion
     public static uint VolumeSerialNumber(string drive)
     {
-        if(!drive.EndsWith(":\\")) drive = drive.Substring(0, 1) + ":\\";
+        if (!drive.EndsWith(":\\")) drive = drive.Substring(0, 1) + ":\\";
         StringBuilder VolumeNameBuffer = new StringBuilder(256);
         uint VolumeSerialNumber;
         uint MaximumComponentLength;
@@ -172,7 +172,7 @@ public static partial class My
     {
         My.iniFile = iniFile; //V214
         Console.WriteLine("{0} ReadIniFile {1} {2}", DateTime.Now, My.ExeFile, My.Version);
-        using(WebClient wc = new WebClient())
+        using (WebClient wc = new WebClient())
         {
             wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadStringCallback2);
             wc.DownloadStringAsync(new Uri(@"https://sites.google.com/site/rudymeijer/" + iniFile));
@@ -194,11 +194,11 @@ public static partial class My
     {
         StringBuilder result = new StringBuilder();
         string pin = pin1.PadLeft(4, '0'); //min length = 4
-        if(pin.Length > 4) pin = pin.Substring(1, 4); //max length 4 
+        if (pin.Length > 4) pin = pin.Substring(1, 4); //max length 4 
         uint e = uint.Parse(pin, System.Globalization.NumberStyles.HexNumber);
         e ^= 0xffff;
         string exo = e.ToString("X4");
-        for(int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++)
         {
             result.Append(pin[i]);
             result.Append(exo[i]);
@@ -213,9 +213,9 @@ public static partial class My
         string pin = (n & 0xffffuL).ToString("X4");
         return pin;
     }
-    public static void Log(string format, params object[] arg)
+    public static void Log(string message)
     {
-        string msg = DateTime.Now.ToString("dd-MM-yyyy HH:mm:ss") + " " + (arg.Length > 0 ? String.Format(format, arg) : format); // V218 V230
+        string msg = $"{DateTime.Now:dd-MM-yyyy HH:mm:ss} {message}";
         //string callstack = My.GetCallStack();
         //msg += callstack;
         Console.WriteLine(msg);
@@ -235,16 +235,16 @@ public static partial class My
     public static void AppendToFile(string fileName, string msg)
     {
         const bool APPEND = true;
-        using(StreamWriter sw = new StreamWriter(fileName, APPEND)) sw.WriteLine(msg);
+        using (StreamWriter sw = new StreamWriter(fileName, APPEND)) sw.WriteLine(msg);
     }
     public static bool WriteToFile(string fileName, string msg)
     {
         try
         {
-            using(StreamWriter sw = new StreamWriter(fileName)) sw.Write(msg);
+            using (StreamWriter sw = new StreamWriter(fileName)) sw.Write(msg);
             return true;
         }
-        catch(IOException)
+        catch (IOException)
         {
             return false;
         }
@@ -252,33 +252,33 @@ public static partial class My
     public static string ReadFromFile(string fileName)
     {
         string content = "";
-        if(File.Exists(fileName))
-            using(StreamReader sr = new StreamReader(fileName)) content = sr.ReadToEnd();
+        if (File.Exists(fileName))
+            using (StreamReader sr = new StreamReader(fileName)) content = sr.ReadToEnd();
         return content;
     }
     public static string ReadRegistry(string keyName)
     {
         RegistryKey rk = Registry.CurrentUser.OpenSubKey(keyName);
-        if(rk == null || rk.ValueCount == 0) return null;
+        if (rk == null || rk.ValueCount == 0) return null;
         return rk.GetValue("").ToString();
     }
     public static bool WriteRegistry(string keyName, string value)
     {
         RegistryKey rk = Registry.CurrentUser.CreateSubKey(keyName);
-        if(rk == null) return false;
+        if (rk == null) return false;
         rk.SetValue("", value);
         return true;
     }
     public static bool WriteRegistry(string key, string name, string value) //V228
     {
         RegistryKey rk = null;
-        if(key.StartsWith("HKLM"))
+        if (key.StartsWith("HKLM"))
             rk = Registry.LocalMachine.CreateSubKey(key.Substring(5));
-        else if(key.StartsWith("HKCU"))
+        else if (key.StartsWith("HKCU"))
             rk = Registry.CurrentUser.CreateSubKey(key.Substring(5));
         else Registry.LocalMachine.CreateSubKey(key);
 
-        if(rk == null) return false;
+        if (rk == null) return false;
         rk.SetValue(name, value);
         return true;
     }
@@ -289,7 +289,7 @@ public static partial class My
     //
     public static void Status(string format, params object[] args)
     {
-        if(args.Length > 0)
+        if (args.Length > 0)
         {
             status(string.Format(format, args));
         }
@@ -302,8 +302,8 @@ public static partial class My
     private static void status(string msg)
     {
         thistoolStripStatusLabel1.Text = msg;
-        if(thistoolStripStatusLabel1.Text.StartsWith("Error")) My.Log(msg);
-        if(msg.StartsWith(" ")) Application.DoEvents();
+        if (thistoolStripStatusLabel1.Text.StartsWith("Error")) My.Log(msg);
+        if (msg.StartsWith(" ")) Application.DoEvents();
     }
 
     public static void SetStatus(ToolStripStatusLabel toolStripStatusLabel1)
@@ -321,13 +321,13 @@ public static partial class My
         try
         {
             FileInfo fi = new FileInfo(filename);
-            if(!fi.Exists) return false;
+            if (!fi.Exists) return false;
             fi.Attributes |= fileAttribute;
             return true;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            My.Log("SetAttribute: {0} {1}", e.Message, filename);
+            My.Log($"SetAttribute: {e.Message} {filename}");
         }
         return false;
     }
@@ -336,19 +336,19 @@ public static partial class My
         try
         {
             FileInfo fi = new FileInfo(filename);
-            if(!fi.Exists) return false;
+            if (!fi.Exists) return false;
             fi.Attributes &= ~fileAttribute;
             return true;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            My.Log("ResetAttribute: {0} {1}", e.Message, filename);
+            My.Log($"ResetAttribute: {e.Message} {filename}");
         }
         return false;
     }
     public static double Val(string s) //V224
     {
-        if(!double.TryParse(s, out double result))
+        if (!double.TryParse(s, out double result))
         {
             // Get unit.
             long u = Units(s.ToUpper());
@@ -365,12 +365,12 @@ public static partial class My
         int begin = 0, len;
         bool blnInNumber = false;
         s += "~"; //add end marker
-        for(int i = 0; i < s.Length; i++)
+        for (int i = 0; i < s.Length; i++)
         {
             char c = s[i];
-            if(((c >= '0') && (c <= '9')) || c == DecimalSeparator)
+            if (((c >= '0') && (c <= '9')) || c == DecimalSeparator)
             {
-                if(!blnInNumber)
+                if (!blnInNumber)
                 {
                     blnInNumber = true;
                     begin = i;
@@ -378,7 +378,7 @@ public static partial class My
             }
             else
             {
-                if(blnInNumber)
+                if (blnInNumber)
                 {
                     len = i - begin;
                     return s.Substring(begin, len);
@@ -389,10 +389,10 @@ public static partial class My
     }
     private static long Units(string s)
     {
-        if(s.Contains("TB")) return 1000000000000;
-        if(s.Contains("GB")) return 1000000000;
-        if(s.Contains("MB")) return 1000000;
-        if(s.Contains("KB")) return 1000;
+        if (s.Contains("TB")) return 1000000000000;
+        if (s.Contains("GB")) return 1000000000;
+        if (s.Contains("MB")) return 1000000;
+        if (s.Contains("KB")) return 1000;
         return 1;
     }
     public static string UserConfigFile //V225
@@ -413,12 +413,12 @@ public static partial class My
     {
         string[] units = new string[] { " Bytes", " KB", " MB", " GB" };
         int i = 0;
-        while(totalBytes >= 1000)
+        while (totalBytes >= 1000)
         {
             i++;
             totalBytes /= 1000;
         }
-        if(i == 0) decimals = 0; // show integer bytes.
+        if (i == 0) decimals = 0; // show integer bytes.
         return totalBytes.ToString(string.Format("F{0}", decimals)) + units[i];
     }
 }
