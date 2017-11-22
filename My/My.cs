@@ -97,7 +97,7 @@ public static partial class My
     }
     public static string iniFile; // V218
     private static string urlStatCounter;
-    public static int ExecutionAllowed(string iniFile) //todo public for test only
+    public static int ExecutionAllowed(string iniFile)
     {
         //
         // read each line of inifile.
@@ -223,6 +223,7 @@ public static partial class My
         // Write to logfile
         //
         AppendToFile(My.ExeFile + ".log", msg);
+        if (message.StartsWith("Error")) MessageBox.Show(msg, $"Hello {UserName} something went wrong. I'm sorry.");
     }
 
     //private static string GetCallStack()
@@ -256,11 +257,19 @@ public static partial class My
             using (StreamReader sr = new StreamReader(fileName)) content = sr.ReadToEnd();
         return content;
     }
-    public static string ReadRegistry(string keyName)
+    public static string ReadRegistry(string key, string name = "")
     {
-        RegistryKey rk = Registry.CurrentUser.OpenSubKey(keyName);
-        if (rk == null || rk.ValueCount == 0) return null;
-        return rk.GetValue("").ToString();
+        if (key.Contains("LOCAL_MACHINE"))
+        {
+            var x = Registry.GetValue(key, name, "");
+            return x.ToString();
+        }
+        else
+        {
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey(key);
+            if (rk == null || rk.ValueCount == 0) return null;
+            return rk.GetValue("").ToString();
+        }
     }
     public static bool WriteRegistry(string keyName, string value)
     {
@@ -287,31 +296,19 @@ public static partial class My
     // 
     // Error message are displayed until a clear is forced with msg: " "  
     //
-    public static void Status(string format, params object[] args)
-    {
-        if (args.Length > 0)
-        {
-            status(string.Format(format, args));
-        }
-        else
-        {
-            status(format);
-        }
-    }
     private static ToolStripStatusLabel thistoolStripStatusLabel1;
-    private static void status(string msg)
+    public static void Status(string msg)
     {
+        if (thistoolStripStatusLabel1 == null) { MessageBox.Show("Please add My.SetStatus(toolStripStatusLabel1) in your Form_Load event."); return; }
         thistoolStripStatusLabel1.Text = msg;
-        if (thistoolStripStatusLabel1.Text.StartsWith("Error")) My.Log(msg);
-        if (msg.StartsWith(" ")) Application.DoEvents();
-    }
+        //if (thistoolStripStatusLabel1.Text.StartsWith("Error"))
 
+        if (!msg.StartsWith(" ")) My.Log(msg);//Application.DoEvents();
+    }
     public static void SetStatus(ToolStripStatusLabel toolStripStatusLabel1)
     {
         thistoolStripStatusLabel1 = toolStripStatusLabel1;
     }
-
-
     public static bool IsSetAttribute(FileSystemInfo fi, FileAttributes fileAttribute)
     {
         return (fi.Attributes & fileAttribute) == fileAttribute;
@@ -353,7 +350,7 @@ public static partial class My
             // Get unit.
             long u = Units(s.ToUpper());
             // Set correct decimal separator.
-            var ss = s.Replace('.',DecimalSeparator).Replace(',',DecimalSeparator);
+            var ss = s.Replace('.', DecimalSeparator).Replace(',', DecimalSeparator);
             // Get Digits.
             string num = GetDigits(ss);
             result = double.Parse(num) * u;
@@ -420,5 +417,21 @@ public static partial class My
         }
         if (i == 0) decimals = 0; // show integer bytes.
         return totalBytes.ToString(string.Format("F{0}", decimals)) + units[i];
+    }
+    public static string WindowsVersion
+    {
+        get
+        {
+            try
+            {
+                var key = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion";
+                var name = My.ReadRegistry(key, "ProductName");
+                return name;
+            }
+            catch (Exception ee)
+            {
+                return "reg " +ee.Message;
+            }
+        }
     }
 }

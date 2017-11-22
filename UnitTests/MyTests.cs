@@ -30,6 +30,7 @@ namespace UnitTests
             Debug.WriteLine($"My.ExePath = {My.ExePath}");
             Debug.WriteLine($"My.UserConfigFile = {My.UserConfigFile}");
             Debug.WriteLine($"My.UserName = {My.UserName}");
+            Debug.WriteLine($"My.WindowsVersion = {My.WindowsVersion}");
 
         }
         [TestMethod]
