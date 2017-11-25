@@ -1,12 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static My;
-
-namespace UnitTests
+namespace My.UnitTests
 {
 	[TestClass()]
 	public class XmlTests
@@ -15,12 +8,13 @@ namespace UnitTests
 		public void SaveFileTest()
 		{
 			var p = new Person() { name = "rudy", adres = "Profeinthovenstraat" };
-			//Xml.SaveFile(p, "person.xml");
-			//Assert.IsTrue();
+			Xml.SaveFile(p, "person.xml");
+			var x = Xml.LoadFile<Person>("person.xml");
+			Assert.IsTrue(x.name =="rudy");
 		}
 	}
 
-	internal class Person
+	public class Person
 	{
 		public Person()
 		{

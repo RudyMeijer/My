@@ -1,17 +1,17 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Xml.Serialization;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
 
-public partial class My
+namespace My
 {
-    public class Xml
+	public class Xml
     {
         public static void SaveFile(object cls, string filename)
         {
-            WriteToFile(filename, Serialize(cls));
+            My.WriteToFile(filename, Serialize(cls));
         }
         public static string Serialize(object cls)
         {
