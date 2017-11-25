@@ -20,9 +20,9 @@ class W32
 	//}
 	//[DllImport("shell32.dll")]
 	//internal static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
- 
+
 	[DllImport("Kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-	internal static extern  bool GetVolumeInformation(
+	internal static extern bool GetVolumeInformation(
 	  string RootPathName,
 	  StringBuilder VolumeNameBuffer,
 	  int VolumeNameSize,
