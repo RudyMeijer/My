@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MyLib;
+using System.Collections.Generic;
+
 namespace UnitTests
 {
 	[TestClass()]
@@ -14,17 +16,25 @@ namespace UnitTests
 			Assert.IsTrue(x.name == "rudy");
 		}
 
+		//[TestMethod()]
+		//public void SerializeJsonTest()
+		//{
+		//	string expect = "{\"adres\":\"Profeinthovenstraat\",\"name\":\"rudy\"}";
+		//	var p = new Person() { name = "rudy", adres = "Profeinthovenstraat" };
+		//	var x = Xml.SerializeJson(p);
+		//	Assert.IsTrue(x == expect, $"Error in json");
+		//}
 		[TestMethod()]
-		public void SerializeJsonTest()
+		public void SaveJsonFileTest()
 		{
-			string expect = "{\"adres\":\"Profeinthovenstraat\",\"name\":\"rudy\"}";
 			var p = new Person() { name = "rudy", adres = "Profeinthovenstraat" };
-			var x = Xml.SerializeJson(p);
-			Assert.IsTrue(x== expect, $"Error in json");
+			Xml.SaveJsonFile(p, "person.json");
+			var x = Xml.LoadJsonFile<Person>("person.json");
+			Assert.IsTrue(x.name == "rudy");
+
 		}
 	}
-
-	public class Person
+		public class Person
 	{
 		public Person()
 		{
