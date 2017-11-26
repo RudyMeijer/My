@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-namespace My.UnitTests
+using MyLib;
+namespace UnitTests
 {
 	[TestClass()]
 	public class XmlTests

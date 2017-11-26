@@ -32,7 +32,7 @@ using Microsoft.Win32;
 using System.Drawing;
 using System.Configuration;
 using System.Globalization;
-namespace My
+namespace MyLib
 {
 	public static partial class My
 	{
