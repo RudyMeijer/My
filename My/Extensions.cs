@@ -31,5 +31,14 @@ namespace MyLib
 			for (int i = 0; i < s1.Length; i++)if (s1[i] != s2[i]) return false;
 			return true;
 		}
+		public static T Clone<T>(this object obj)
+		{
+			//
+			// If object is null then return default type.
+			//
+			if (obj == null) return default(T);
+			var s1 = Xml.Serialize(obj);
+			return Xml.Deserialize<T>(s1);
+		}
 	}
 }

@@ -23,23 +23,6 @@ namespace MyLib
 				return new UTF8Encoding().GetString(ms.ToArray());
 			}
 		}
-		public static T LoadJsonFile<T>(string filename)
-		{
-			DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(T));
-			using (var fs = new FileStream(filename, FileMode.Open))
-				return (T)js.ReadObject(fs);
-		}
-
-		public static void SaveJsonFile(object obj, string filename)
-		{
-			DataContractJsonSerializer js = new DataContractJsonSerializer(obj.GetType());
-			using (var ms = new FileStream(filename,FileMode.OpenOrCreate))
-			{
-				js.WriteObject(ms, obj);
-			}
-		}
-
-
 		public static T LoadFile<T>(string filename)
 		{
 			return Deserialize<T>(My.ReadFromFile(filename));
@@ -90,5 +73,19 @@ namespace MyLib
 				}
 			return cls;
 		}
+		#region JSON
+		public static T LoadJsonFile<T>(string filename)
+		{
+			DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(T));
+			using (var fs = new FileStream(filename, FileMode.Open))
+				return (T)js.ReadObject(fs);
+		}
+		public static void SaveJsonFile(object obj, string filename)
+		{
+			DataContractJsonSerializer js = new DataContractJsonSerializer(obj.GetType());
+			using (var ms = new FileStream(filename, FileMode.OpenOrCreate))
+				js.WriteObject(ms, obj);
+		}
+		#endregion
 	}
 }
