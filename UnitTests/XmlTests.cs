@@ -11,7 +11,16 @@ namespace UnitTests
 			var p = new Person() { name = "rudy", adres = "Profeinthovenstraat" };
 			Xml.SaveFile(p, "person.xml");
 			var x = Xml.LoadFile<Person>("person.xml");
-			Assert.IsTrue(x.name =="rudy");
+			Assert.IsTrue(x.name == "rudy");
+		}
+
+		[TestMethod()]
+		public void SerializeJsonTest()
+		{
+			string expect = "{\"adres\":\"Profeinthovenstraat\",\"name\":\"rudy\"}";
+			var p = new Person() { name = "rudy", adres = "Profeinthovenstraat" };
+			var x = Xml.SerializeJson(p);
+			Assert.IsTrue(x== expect, $"Error in json");
 		}
 	}
 
