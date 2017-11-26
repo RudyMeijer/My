@@ -33,8 +33,19 @@ namespace UnitTests
 			Assert.IsTrue(x.name == "rudy");
 
 		}
+		[TestMethod()]
+		public void SaveListJsonFileTest()
+		{
+			var list = new List<Person>();
+			list.Add(new Person() { name = "Rudy", adres = "Profein{thovenstraat" });
+			list.Add(new Person() { name = "Henk", adres = "Bathmens,eweg 11" });
+			Xml.SaveJsonFile(list, "persons.json");
+			var x = Xml.LoadJsonFile<List<Person>>("persons.json");
+			Assert.IsTrue(x[0].name == "Rudy");
+			Assert.IsTrue(x[1].name == "Henk");
+		}
 	}
-		public class Person
+	public class Person
 	{
 		public Person()
 		{
