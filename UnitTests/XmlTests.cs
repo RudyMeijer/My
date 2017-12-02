@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MyLib;
+using System;
 using System.Collections.Generic;
 
 namespace UnitTests
@@ -45,6 +46,7 @@ namespace UnitTests
 			Assert.IsTrue(x[1].name == "Henk");
 		}
 	}
+	[Serializable]
 	public class Person
 	{
 		public Person()

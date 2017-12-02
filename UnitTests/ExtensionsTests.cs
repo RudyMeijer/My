@@ -18,7 +18,7 @@ namespace UnitTests
 			var obj1 = new Person() { name = "Rudy", adres = "Profeinthovenstraat" };
 			var obj2 = new Person() { name = "Rudy", adres = "Profeinthovenstraat" };
 			var obj3 = new Person() { name = "Rudy", adres = "Profeinth0venstraat" };
-			Assert.IsTrue(obj0.IsEqual(obj0), $"obj3 not equal.");
+			Assert.IsTrue(obj0.IsEqual(obj0), $"obj0 not equal.");
 			Assert.IsTrue(obj1.IsEqual(obj2), $"object are not equal.");
 			Assert.IsTrue(!obj1.IsEqual(obj3), $"object are equal.");
 		}
@@ -28,7 +28,7 @@ namespace UnitTests
 		{
 			var p = new Person() { name = "Rudy", adres = "Profeinthovenstraat" };
 			var q = p;
-			var r = p.Clone<Person>();
+			var r = (Person)p.DeepClone();
 			p.name = "Piet";
 			Assert.IsTrue(p.name == "Piet", "Always");
 			Assert.IsTrue(q.name == "Piet", "Always");

@@ -5,7 +5,7 @@ using System.IO;
 namespace UnitTests
 {
 	[TestClass]
-	public class MyTest
+	public class MyTests
 	{
 		[TestMethod]
 		//
@@ -70,6 +70,15 @@ namespace UnitTests
 			Assert.IsTrue(My.SetAttribute("test.txt", FileAttributes.ReadOnly), $"MySetAttribute is false");
 			Assert.IsTrue(My.IsSetAttribute(new FileInfo("test.txt"), FileAttributes.Archive), $"MyIsSetAttribute is false");
 			Assert.IsTrue(My.ResetAttribute("test.txt", FileAttributes.ReadOnly), $"MyResetAttribute is false");
+		}
+
+		[TestMethod()]
+		public void ValidateFilenameTest()
+		{
+			var invalid = @"//filename ""with \\valid characters?";
+			var valid = @"filename with valid characters";
+			var res = My.ValidateFilename(invalid);
+			Assert.IsTrue(res==valid,"filename contains invalid characters.");
 		}
 	}
 }

@@ -32,6 +32,8 @@ using Microsoft.Win32;
 using System.Drawing;
 using System.Configuration;
 using System.Globalization;
+using System.Speech.Synthesis;
+
 namespace MyLib
 {
 	public static partial class My
@@ -44,6 +46,15 @@ namespace MyLib
 		public static string ExeFile { get; set; } = ExePath + Path.GetFileNameWithoutExtension(ExeFullFile);
 		public static string Drive { get; set; } = Path.GetPathRoot(ExePath);
 		public static string ProcessName { get; set; } = Process.GetCurrentProcess().ProcessName;
+
+		public static void PlaySound(string text)
+		{
+			var synthesizer = new SpeechSynthesizer();
+			synthesizer.Volume = 100;  // 0...100
+			synthesizer.Rate = -2;     // -10...10
+			synthesizer.SelectVoiceByHints(VoiceGender.Female);
+			synthesizer.SpeakAsync(text);
+		}
 
 		public static string UserName { get; set; } = Environment.UserName;
 		public static string IPAddress
@@ -63,6 +74,22 @@ namespace MyLib
 			get
 			{
 				return GetPin(Drive);
+			}
+		}
+		public static string WindowsVersion
+		{
+			get
+			{
+				try
+				{
+					var key = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion";
+					var name = My.ReadRegistry(key, "ProductName");
+					return name;
+				}
+				catch (Exception ee)
+				{
+					return "reg " + ee.Message;
+				}
 			}
 		}
 		#endregion
@@ -150,17 +177,14 @@ namespace MyLib
 		{
 			if (!drive.EndsWith(":\\")) drive = drive.Substring(0, 1) + ":\\";
 			StringBuilder VolumeNameBuffer = new StringBuilder(256);
-			uint VolumeSerialNumber;
-			uint MaximumComponentLength;
-			uint FileSystemFlags;
 			StringBuilder FileSystemNameBuffer = new StringBuilder(256);
 
 			bool ret = W32.GetVolumeInformation(drive,
 												VolumeNameBuffer,
 												VolumeNameBuffer.Capacity,
-												out VolumeSerialNumber,
-												out MaximumComponentLength,
-												out FileSystemFlags,
+												out uint VolumeSerialNumber,
+												out uint MaximumComponentLength,
+												out uint FileSystemFlags,
 												FileSystemNameBuffer,
 												FileSystemNameBuffer.Capacity);
 			return VolumeSerialNumber;
@@ -226,7 +250,6 @@ namespace MyLib
 			AppendToFile(My.ExeFile + ".log", msg);
 			if (message.StartsWith("Error")) MessageBox.Show(msg, $"Hello {UserName} something went wrong. I'm sorry.");
 		}
-
 		//private static string GetCallStack()
 		//{
 		//    StackTrace st = new StackTrace(true);
@@ -298,6 +321,7 @@ namespace MyLib
 		// Error message are displayed until a clear is forced with msg: " "  
 		//
 		private static ToolStripStatusLabel thistoolStripStatusLabel1;
+		//private static SpeechSynthesizer synthesizer;
 		public static void Status(string msg)
 		{
 			if (thistoolStripStatusLabel1 == null) { MessageBox.Show("Please add My.SetStatus(toolStripStatusLabel1) in your Form_Load event."); return; }
@@ -419,14 +443,12 @@ namespace MyLib
 			if (i == 0) decimals = 0; // show integer bytes.
 			return totalBytes.ToString(string.Format("F{0}", decimals)) + units[i];
 		}
-
 		public static object ResetBit(int bitNr, Char item)
 		{
 			int mask = (1 << bitNr);
 			mask ^= 0xff;
 			return item & mask;
 		}
-
 		/// <summary>
 		/// Returns a readable sentence: Start with capital letter followed by lowercase letters.
 		/// underscores are replaced by spaces.
@@ -439,22 +461,20 @@ namespace MyLib
 			var result = item.ToLower().Replace('_', ' ').Substring(1);
 			return item[0].ToString().ToUpper() + result;
 		}
-
-		public static string WindowsVersion
+		public static string CheckPath(params string[] paths)
 		{
-			get
-			{
-				try
-				{
-					var key = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion";
-					var name = My.ReadRegistry(key, "ProductName");
-					return name;
-				}
-				catch (Exception ee)
-				{
-					return "reg " + ee.Message;
-				}
-			}
+			var path = Path.Combine(paths);
+			if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+			return path;
+		}
+		/// <summary>
+		/// Return a filename without invalid characters.
+		/// </summary>
+		/// <param name="fileName"></param>
+		/// <returns></returns>
+		public static string ValidateFilename(string fileName)
+		{
+			return String.Concat(fileName.Split(Path.GetInvalidFileNameChars()));
 		}
 	}
 }

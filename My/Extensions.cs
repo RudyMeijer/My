@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,14 +33,19 @@ namespace MyLib
 			for (int i = 0; i < s1.Length; i++)if (s1[i] != s2[i]) return false;
 			return true;
 		}
-		public static T Clone<T>(this object obj)
+		public static object DeepClone(this object obj)
 		{
-			//
-			// If object is null then return default type.
-			//
-			if (obj == null) return default(T);
-			var s1 = Xml.Serialize(obj);
-			return Xml.Deserialize<T>(s1);
+			object objResult = null;
+			if (obj == null) return null;
+			using (MemoryStream ms = new MemoryStream())
+			{
+				BinaryFormatter bf = new BinaryFormatter();
+				bf.Serialize(ms, obj);
+
+				ms.Position = 0;
+				objResult = bf.Deserialize(ms);
+			}
+			return objResult;
 		}
 	}
 }
