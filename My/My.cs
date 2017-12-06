@@ -238,15 +238,19 @@ namespace MyLib
 			string pin = (n & 0xffffuL).ToString("X4");
 			return pin;
 		}
+		/// <summary>
+		/// To log all Console message:
+		/// 1) Open command window and run application piped to txt.log
+		/// 2) C:\YourExePath>application.exe > txt.log
+		/// </summary>
+		/// <param name="message"></param>
 		public static void Log(string message)
 		{
 			string msg = $"{DateTime.Now:dd-MM-yyyy HH:mm:ss} {message}";
-			//string callstack = My.GetCallStack();
-			//msg += callstack;
 			Console.WriteLine(msg);
 			//
 			// Write to logfile
-			//
+			// 
 			AppendToFile(My.ExeFile + ".log", msg);
 			if (message.StartsWith("Error")) MessageBox.Show(msg, $"Hello {UserName} something went wrong. I'm sorry.");
 		}
