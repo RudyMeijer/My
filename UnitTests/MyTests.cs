@@ -26,7 +26,7 @@ namespace UnitTests
 			Debug.WriteLine($"My.UserConfigFile = {My.UserConfigFile}");
 			Debug.WriteLine($"My.UserName = {My.UserName}");
 			Debug.WriteLine($"My.WindowsVersion = {My.WindowsVersion}");
-
+			Assert.IsTrue(My.ExeFile == "testhost.x86", "Error exefile");
 		}
 		[TestMethod]
 		public void Val()

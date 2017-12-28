@@ -41,11 +41,12 @@ namespace MyLib
 		#region Properties
 		public static Char DecimalSeparator { get; set; } = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator[0];
 		public static string Version { get; set; } = " V" + Application.ProductVersion.Substring(0, 5);//V226
-		private static string ExeFullFile { get; set; } = Application.ExecutablePath;
+		private static string ExeFullFile { get; set; } = Application.ExecutablePath; // examen: System.Reflection.Assembly.GetEntryAssembly().FullName.Split(',')[0];
 		public static string ExePath { get; set; } = Path.GetDirectoryName(ExeFullFile) + "\\";
-		public static string ExeFile { get; set; } = ExePath + Path.GetFileNameWithoutExtension(ExeFullFile);
+		public static string ExeFile { get; set; } = Path.GetFileNameWithoutExtension(ExeFullFile);
 		public static string Drive { get; set; } = Path.GetPathRoot(ExePath);
 		public static string ProcessName { get; set; } = Process.GetCurrentProcess().ProcessName;
+		public static string CurrentDirectory { get; set; } = Directory.GetCurrentDirectory();
 
 		public static void PlaySound(string text)
 		{
@@ -244,15 +245,16 @@ namespace MyLib
 		/// 2) C:\YourExePath>application.exe > txt.log
 		/// </summary>
 		/// <param name="message"></param>
-		public static void Log(string message)
+		public static void Log(string message, string logFile = "")
 		{
 			string msg = $"{DateTime.Now:dd-MM-yyyy HH:mm:ss} {message}";
 			Console.WriteLine(msg);
+			if (logFile != "") LogFile = logFile;
 			//
 			// Write to logfile
-			// 
-			AppendToFile(My.ExeFile + ".log", msg);
-			if (message.StartsWith("Error")) MessageBox.Show(msg, $"Hello {UserName} something went wrong. I'm sorry.");
+			//
+			AppendToFile(LogFile, msg);
+			if (message.StartsWith("Error:")) MessageBox.Show(msg, $"Hello {UserName} something went wrong. I'm sorry.");
 		}
 		//private static string GetCallStack()
 		//{
@@ -306,6 +308,15 @@ namespace MyLib
 			rk.SetValue("", value);
 			return true;
 		}
+
+		public static DialogResult Show(string msg, string title = null, MessageBoxButtons buttons = MessageBoxButtons.OK)
+		{
+			if (title == null) title = $"Dear mr {My.UserName}";
+			var res = MessageBox.Show(msg, title, buttons);
+			My.Log($"{title}: {msg} {res} entered by {My.UserName}.");
+			return res;
+		}
+
 		public static bool WriteRegistry(string key, string name, string value) //V228
 		{
 			RegistryKey rk = null;
@@ -325,13 +336,15 @@ namespace MyLib
 		// Error message are displayed until a clear is forced with msg: " "  
 		//
 		private static ToolStripStatusLabel thistoolStripStatusLabel1;
-		//private static SpeechSynthesizer synthesizer;
-		public static void Status(string msg)
+		public static void Status(string msg, Color? color = null)
 		{
+			if (msg.Contains("Error")) color = Color.Red;
 			if (thistoolStripStatusLabel1 == null) { MessageBox.Show("Please add My.SetStatus(toolStripStatusLabel1) in your Form_Load event."); return; }
-			thistoolStripStatusLabel1.Text = msg;
-			//if (thistoolStripStatusLabel1.Text.StartsWith("Error"))
-
+			if (thistoolStripStatusLabel1.BackColor == SystemColors.Control || color == SystemColors.Control)
+			{
+				thistoolStripStatusLabel1.Text = msg;
+			thistoolStripStatusLabel1.BackColor = color ?? SystemColors.Control;
+			}
 			if (!msg.StartsWith(" ")) My.Log(msg);//Application.DoEvents();
 		}
 		public static void SetStatus(ToolStripStatusLabel toolStripStatusLabel1)
@@ -431,6 +444,9 @@ namespace MyLib
 
 			}
 		}
+
+		public static string LogFile { get; private set; } = $"{My.ExeFile} {My.Version}.log";
+
 		public static string BeautySize(long totalBytes) //V227
 		{
 			return BeautySize(totalBytes, 2);
@@ -467,9 +483,10 @@ namespace MyLib
 		}
 		public static string CheckPath(params string[] paths)
 		{
-			var path = Path.Combine(paths);
+			var filename = Path.Combine(paths);
+			var path = Path.GetDirectoryName(filename);
 			if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-			return path;
+			return filename;
 		}
 		/// <summary>
 		/// Return a filename without invalid characters.

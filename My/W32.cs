@@ -33,6 +33,8 @@ namespace MyLib
 		  StringBuilder FileSystemNameBuffer,
 		  int nFileSystemNameSize);
 
+		[DllImport("user32.dll")]
+		public static extern Int32 SwapMouseButton(Int32 bSwap);
 	}
 }
 
