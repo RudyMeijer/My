@@ -33,6 +33,7 @@ using System.Drawing;
 using System.Configuration;
 using System.Globalization;
 using System.Speech.Synthesis;
+using System.Reflection;
 
 namespace MyLib
 {
@@ -40,9 +41,13 @@ namespace MyLib
 	{
 		#region Properties
 		public static Char DecimalSeparator { get; set; } = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator[0];
-		public static string Version { get; set; } = " V" + Application.ProductVersion.Substring(0, 5);//V226
+		public static string Version { get; set; } = " V" + Application.ProductVersion.Substring(0, Application.ProductVersion.LastIndexOf('.'));
 		private static string ExeFullFile { get; set; } = Application.ExecutablePath; // examen: System.Reflection.Assembly.GetEntryAssembly().FullName.Split(',')[0];
 		public static string ExePath { get; set; } = Path.GetDirectoryName(ExeFullFile) + "\\";
+		public static T GetEnum<T>(string value)
+		{
+			return (T)Enum.Parse(typeof(T), value, true);
+		}
 		public static string ExeFile { get; set; } = Path.GetFileNameWithoutExtension(ExeFullFile);
 		public static string Drive { get; set; } = Path.GetPathRoot(ExePath);
 		public static string ProcessName { get; set; } = Process.GetCurrentProcess().ProcessName;
@@ -312,8 +317,9 @@ namespace MyLib
 		public static DialogResult Show(string msg, string title = null, MessageBoxButtons buttons = MessageBoxButtons.OK)
 		{
 			if (title == null) title = $"Dear mr {My.UserName}";
+			My.Log($"Show {title}: {msg}");
 			var res = MessageBox.Show(msg, title, buttons);
-			My.Log($"{title}: {msg} {res} entered by {My.UserName}.");
+			My.Log($"{res} entered by {My.UserName}.");
 			return res;
 		}
 
@@ -343,7 +349,7 @@ namespace MyLib
 			if (thistoolStripStatusLabel1.BackColor == SystemColors.Control || color == SystemColors.Control)
 			{
 				thistoolStripStatusLabel1.Text = msg;
-			thistoolStripStatusLabel1.BackColor = color ?? SystemColors.Control;
+				thistoolStripStatusLabel1.BackColor = color ?? SystemColors.Control;
 			}
 			if (!msg.StartsWith(" ")) My.Log(msg);//Application.DoEvents();
 		}
@@ -496,6 +502,32 @@ namespace MyLib
 		public static string ValidateFilename(string fileName)
 		{
 			return String.Concat(fileName.Split(Path.GetInvalidFileNameChars()));
+		}
+		/// <summary>
+		/// Invoke a class private methode. Can be used during unittesting.
+		/// </summary>
+		/// <param name="classInstance">The object on which to invoke the method or constructor. If a method is static, this argument is ignored.</param>
+		/// <param name="methodeName"></param>
+		/// <param name="parameters"></param>
+		/// <returns></returns>
+		public static object Invoke(object classInstance, string methodeName, params object[] parameters)
+		{
+			var bf = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod;
+			if (classInstance == null) bf |= BindingFlags.Static;
+			var m = classInstance.GetType().GetMethod(methodeName, bf);
+			var r = m?.Invoke(classInstance, parameters);
+			return r;
+		}
+		/// <summary>
+		/// Return a private or static field. Can be used during unittesting.
+		/// </summary>
+		/// <param name="obj">The object from which to retrieve the field.</param>
+		/// <param name="fieldname">The name of the field to retrieve.</param>
+		/// <returns></returns>
+		public static object GetField(object obj, string fieldname)
+		{
+			var bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static;
+			return obj?.GetType().GetField(fieldname, bf)?.GetValue(obj);
 		}
 	}
 }
