@@ -196,9 +196,6 @@ namespace MyLib
 			return VolumeSerialNumber;
 
 		}
-		//
-		// Call this function to monitor statistics and to remote control program execution.
-		//
 		public static void ReadIniFile(string iniFile)
 		{
 			My.iniFile = iniFile; //V214
@@ -209,17 +206,6 @@ namespace MyLib
 				wc.DownloadStringAsync(new Uri(@"https://sites.google.com/site/rudymeijer/" + iniFile));
 			}
 			Console.WriteLine("{0} ReadIniFile end", DateTime.Now);
-		}
-		[Obsolete("Use GenerateLicenseKeyx64")]
-		public static string GenerateLicenseKey()
-		{
-			return GenerateLicenseKey(Pin);
-		}
-		[Obsolete("Use GenerateLicenseKeyx64")]
-		public static string GenerateLicenseKey(string pin)
-		{
-			string pin1 = pin + "dfr6ft"; //V103
-			return pin1.GetHashCode().ToString("X8");
 		}
 		public static string GenerateLicenseKeyx64(string pin1) //V231
 		{
@@ -491,7 +477,7 @@ namespace MyLib
 		{
 			var filename = Path.Combine(paths);
 			var path = Path.GetDirectoryName(filename);
-			if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+			if (path != "" && !Directory.Exists(path)) Directory.CreateDirectory(path);
 			return filename;
 		}
 		/// <summary>
@@ -529,5 +515,22 @@ namespace MyLib
 			var bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static;
 			return obj?.GetType().GetField(fieldname, bf)?.GetValue(obj);
 		}
+		/// <summary>
+		/// Linear interpolation. https://en.wikipedia.org/wiki/Linear_interpolation
+		/// This function returns a value between V0 and V1 dependant on value t [0 - 1].
+		/// </summary>
+		/// <param name="t between 0 and 1"></param>
+		/// <param name="V0"></param>
+		/// <param name="V1"></param>
+		/// <returns></returns>
+		public static float Lerp(float t, float V0, float V1) => V0 + t * (V1 - V0);
+		/// <summary>
+		/// This function returns a value between 0 and 1 dependant on value t [V0 - V1] 
+		/// </summary>
+		/// <param name="t value between V0 and V1."></param>
+		/// <param name="V0"></param>
+		/// <param name="V1"></param>
+		/// <returns></returns>
+		public static float InverseLerp(float t, float V0, float V1) => (t - V0) / (V1 - V0);
 	}
 }

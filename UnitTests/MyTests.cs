@@ -78,7 +78,28 @@ namespace UnitTests
 			var invalid = @"//filename ""with \\valid characters?";
 			var valid = @"filename with valid characters";
 			var res = My.ValidateFilename(invalid);
-			Assert.IsTrue(res==valid,"filename contains invalid characters.");
+			Assert.IsTrue(res == valid, "filename contains invalid characters.");
+		}
+
+		[TestMethod()]
+		public void LerpTest()
+		{
+			var V0 = 10f;
+			var V1 = 20f;
+			var r = My.Lerp(0, V0, V1);
+			Assert.IsTrue(r == V0, $"InverseLerp should be {V0} {r}");
+			r = My.Lerp(0.5f, V0, V1);
+			Assert.IsTrue(r == 15, $"InverseLerp should be 15f {r}");
+			r = My.Lerp(1f, V0, V1);
+			Assert.IsTrue(r == V1, $"InverseLerp should be {V1} {r}");
+
+
+			r = My.InverseLerp(10f, V0, V1);
+			Assert.IsTrue(r == 0, $"InverseLerp should be 0 {r}");
+			r = My.InverseLerp(15f, V0, V1);
+			Assert.IsTrue(r == 0.5, $"InverseLerp should be 0.5 {r}");
+			r = My.InverseLerp(20f, V0, V1);
+			Assert.IsTrue(r == 1, $"InverseLerp should be 1 {r}");
 		}
 	}
 }
