@@ -52,6 +52,7 @@ namespace MyLib
 		public static string Drive { get; set; } = Path.GetPathRoot(ExePath);
 		public static string ProcessName { get; set; } = Process.GetCurrentProcess().ProcessName;
 		public static string CurrentDirectory { get; set; } = Directory.GetCurrentDirectory();
+		public static NumberFormatInfo provider = CultureInfo.GetCultureInfo("en").NumberFormat;
 
 		public static void PlaySound(string text)
 		{
@@ -129,6 +130,13 @@ namespace MyLib
 			}
 			else Console.WriteLine(e.Error.Message);
 		}
+
+		public static bool Bool(string s, bool defaultValue=false)
+		{
+			if (s == null || s == "") return defaultValue;
+			return (s == "1");
+		}
+
 		public static string iniFile; // V218
 		private static string urlStatCounter;
 		public static int ExecutionAllowed(string iniFile)
@@ -377,18 +385,20 @@ namespace MyLib
 			}
 			return false;
 		}
-		public static double Val(string s) //V224
+		public static Double Val(string s, Double defaultValue=0) //V224
 		{
-			if (!double.TryParse(s, out double result))
-			{
-				// Get unit.
-				long u = Units(s.ToUpper());
-				// Set correct decimal separator.
-				var ss = s.Replace('.', DecimalSeparator).Replace(',', DecimalSeparator);
-				// Get Digits.
-				string num = GetDigits(ss);
-				result = double.Parse(num) * u;
-			}
+			if (s.Length == 0) return defaultValue;
+			Double.TryParse(s.Replace(',', '.'), NumberStyles.AllowDecimalPoint, provider, out double result);
+			//if (!double.TryParse(s, out double result))
+			//{
+			//	// Get unit.
+			//	long u = Units(s.ToUpper());
+			//	// Set correct decimal separator.
+			//	var ss = s.Replace('.', DecimalSeparator).Replace(',', DecimalSeparator);
+			//	// Get Digits.
+			//	string num = GetDigits(ss);
+			//	result = double.Parse(num) * u;
+			//}
 			return result;
 		}
 		private static string GetDigits(string s)
