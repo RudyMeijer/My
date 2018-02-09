@@ -388,18 +388,17 @@ namespace MyLib
 		public static Double Val(string s, Double defaultValue=0) //V224
 		{
 			if (s.Length == 0) return defaultValue;
-			Double.TryParse(s.Replace(',', '.'), NumberStyles.AllowDecimalPoint, provider, out double result);
-			//if (!double.TryParse(s, out double result))
-			//{
-			//	// Get unit.
-			//	long u = Units(s.ToUpper());
-			//	// Set correct decimal separator.
-			//	var ss = s.Replace('.', DecimalSeparator).Replace(',', DecimalSeparator);
-			//	// Get Digits.
-			//	string num = GetDigits(ss);
-			//	result = double.Parse(num) * u;
-			//}
-			return result;
+			if (!Double.TryParse(s.Replace(',', '.'), NumberStyles.Any, provider, out double result))
+            {
+                // Get unit.
+                long u = Units(s.ToUpper());
+                // Set correct decimal separator.
+                var ss = s.Replace('.', DecimalSeparator).Replace(',', DecimalSeparator);
+                // Get Digits.
+                string num = GetDigits(ss);
+                result = double.Parse(num) * u;
+            }
+            return result;
 		}
 		private static string GetDigits(string s)
 		{
