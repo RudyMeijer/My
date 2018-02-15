@@ -42,7 +42,7 @@ namespace MyLib
 		#region Properties
 		public static Char DecimalSeparator { get; set; } = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator[0];
 		public static string Version { get; set; } = " V" + Application.ProductVersion.Substring(0, Application.ProductVersion.LastIndexOf('.'));
-		private static string ExeFullFile { get; set; } = Application.ExecutablePath; // examen: System.Reflection.Assembly.GetEntryAssembly().FullName.Split(',')[0];
+		private static string ExeFullFile = Application.ExecutablePath; //// examen: System.Reflection.Assembly.GetEntryAssembly().FullName.Split(',')[0];
 		public static string ExePath { get; set; } = Path.GetDirectoryName(ExeFullFile) + "\\";
 		public static T GetEnum<T>(string value)
 		{
@@ -52,7 +52,7 @@ namespace MyLib
 		public static string Drive { get; set; } = Path.GetPathRoot(ExePath);
 		public static string ProcessName { get; set; } = Process.GetCurrentProcess().ProcessName;
 		public static string CurrentDirectory { get; set; } = Directory.GetCurrentDirectory();
-		public static NumberFormatInfo provider = CultureInfo.GetCultureInfo("en").NumberFormat;
+		private static NumberFormatInfo provider = CultureInfo.GetCultureInfo("en").NumberFormat;
 
 		public static void PlaySound(string text)
 		{
@@ -131,13 +131,13 @@ namespace MyLib
 			else Console.WriteLine(e.Error.Message);
 		}
 
-		public static bool Bool(string s, bool defaultValue=false)
+		public static bool Bool(string s, bool defaultValue = false)
 		{
 			if (s == null || s == "") return defaultValue;
 			return (s == "1");
 		}
 
-		public static string iniFile; // V218
+		private static string iniFile; // V218
 		private static string urlStatCounter;
 		public static int ExecutionAllowed(string iniFile)
 		{
@@ -193,7 +193,7 @@ namespace MyLib
 			StringBuilder VolumeNameBuffer = new StringBuilder(256);
 			StringBuilder FileSystemNameBuffer = new StringBuilder(256);
 
-			bool ret = W32.GetVolumeInformation(drive,
+			W32.GetVolumeInformation(drive,
 												VolumeNameBuffer,
 												VolumeNameBuffer.Capacity,
 												out uint VolumeSerialNumber,
@@ -255,13 +255,6 @@ namespace MyLib
 			AppendToFile(LogFile, msg);
 			if (message.StartsWith("Error:")) MessageBox.Show(msg, $"Hello {UserName} something went wrong. I'm sorry.");
 		}
-		//private static string GetCallStack()
-		//{
-		//    StackTrace st = new StackTrace(true);
-		//    StackFrame sf = st.GetFrame(3);
-		//    string s = String.Format(" at file {0} line {1} in methode: {2} ", sf.GetFileName(), sf.GetFileLineNumber(), sf.GetMethod());
-		//    return s;
-		//}
 		public static void AppendToFile(string fileName, string msg)
 		{
 			const bool APPEND = true;
@@ -345,7 +338,7 @@ namespace MyLib
 				thistoolStripStatusLabel1.Text = msg;
 				thistoolStripStatusLabel1.BackColor = color ?? SystemColors.Control;
 			}
-			if (!msg.StartsWith(" ")) My.Log(msg);//Application.DoEvents();
+			if (!msg.StartsWith(" ")) My.Log(msg);// Application DoEvents()
 		}
 		public static void SetStatus(ToolStripStatusLabel toolStripStatusLabel1)
 		{
@@ -385,20 +378,20 @@ namespace MyLib
 			}
 			return false;
 		}
-		public static Double Val(string s, Double defaultValue=0) //V224
+		public static Double Val(string s, Double defaultValue = 0) //V224
 		{
 			if (s.Length == 0) return defaultValue;
 			if (!Double.TryParse(s.Replace(',', '.'), NumberStyles.Any, provider, out double result))
-            {
-                // Get unit.
-                long u = Units(s.ToUpper());
-                // Set correct decimal separator.
-                var ss = s.Replace('.', DecimalSeparator).Replace(',', DecimalSeparator);
-                // Get Digits.
-                string num = GetDigits(ss);
-                result = double.Parse(num) * u;
-            }
-            return result;
+			{
+				// Get unit.
+				long u = Units(s.ToUpper());
+				// Set correct decimal separator.
+				var ss = s.Replace('.', DecimalSeparator).Replace(',', DecimalSeparator);
+				// Get Digits.
+				string num = GetDigits(ss);
+				result = double.Parse(num) * u;
+			}
+			return result;
 		}
 		private static string GetDigits(string s)
 		{
@@ -440,7 +433,7 @@ namespace MyLib
 			get
 			{
 				Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
-				//Console.WriteLine("Local user config path: {0}", config.FilePath);
+				//Console.WriteLine("Local user config path: {0}", config.FilePath)
 				return config.FilePath;
 
 			}
@@ -509,7 +502,7 @@ namespace MyLib
 		{
 			var bf = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod;
 			if (classInstance == null) bf |= BindingFlags.Static;
-			var m = classInstance.GetType().GetMethod(methodeName, bf);
+			var m = classInstance?.GetType().GetMethod(methodeName, bf);
 			var r = m?.Invoke(classInstance, parameters);
 			return r;
 		}
