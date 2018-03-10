@@ -34,6 +34,8 @@ using System.Configuration;
 using System.Globalization;
 using System.Speech.Synthesis;
 using System.Reflection;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MyLib
 {
@@ -60,7 +62,7 @@ namespace MyLib
 			synthesizer.Volume = 100;  // 0...100
 			synthesizer.Rate = -2;     // -10...10
 			synthesizer.SelectVoiceByHints(VoiceGender.Female);
-			synthesizer.SpeakAsync(text);
+			synthesizer.SpeakAsync(text.Replace('_',' '));
 		}
 
 		public static string UserName { get; set; } = Environment.UserName;
@@ -477,6 +479,7 @@ namespace MyLib
 		}
 		public static string CheckPath(params string[] paths)
 		{
+			for (int i = 1; i < paths.Length; i++) paths[i] = paths[i].Trim('\\');
 			var filename = Path.Combine(paths);
 			var path = Path.GetDirectoryName(filename);
 			if (path != "" && !Directory.Exists(path)) Directory.CreateDirectory(path);
@@ -534,5 +537,33 @@ namespace MyLib
 		/// <param name="V1"></param>
 		/// <returns></returns>
 		public static float InverseLerp(float t, float V0, float V1) => (t - V0) / (V1 - V0);
+		/// <summary>
+		/// Extension methode which iterates thrue each control on a form. 
+		/// </summary>
+		/// <param name="parent"></param>
+		/// <param name="action"></param>
+		public static void ForAllControls(this Control parent, Action<Control> action)
+		{
+			foreach (Control c in parent.Controls)
+			{
+				action(c);
+				ForAllControls(c, action);
+			}
+		}
+		/// <summary>
+		/// This function retuns all controls of a specific type.
+		/// example: var c = GetAll(this,typeof(TextBox));
+		/// </summary>
+		/// <param name="control"></param>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		public static IEnumerable<Control> GetAll(Control control, Type type=null)
+		{
+			var controls = control.Controls.Cast<Control>();
+
+			return controls.SelectMany(ctrl => GetAll(ctrl, type))
+									  .Concat(controls)
+									  .Where(c => c.GetType() == type || type==null);
+		}
 	}
 }
