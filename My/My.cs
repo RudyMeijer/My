@@ -353,17 +353,31 @@ namespace MyLib
         // Error message are displayed until a clear is forced with msg: " "  
         //
         private static ToolStripStatusLabel thistoolStripStatusLabel1;
+        // This delegate enables asynchronous calls for setting  
+        // the text property on a control.  
+        delegate void StringArgReturningVoidDelegate(string msg, Color? color = null, params object[] args);
         public static void Status(string msg, Color? color = null, params object[] args)
         {
-            if (msg.Contains("Error")) color = Color.Red;
-            if (thistoolStripStatusLabel1 == null) { MessageBox.Show("Please add My.InitStatus(toolStripStatusLabel1) in your Form_Load event."); return; }
-            if (args.Length>0) msg = String.Format(msg, args);
-            if (thistoolStripStatusLabel1.BackColor == SystemColors.Control || color == SystemColors.Control)
+            var parent = thistoolStripStatusLabel1.GetCurrentParent();
+            // InvokeRequired required compares the thread ID of the  
+            // calling thread to the thread ID of the creating thread.  
+            // If these threads are different, it returns true.  
+            if (parent.InvokeRequired)
             {
-                thistoolStripStatusLabel1.Text = msg;
-                thistoolStripStatusLabel1.BackColor = color ?? SystemColors.Control;
+               parent.Invoke(new StringArgReturningVoidDelegate(Status), new object[] { msg, color, args });
             }
-            if (msg.Length > 0 && !msg.StartsWith(" ")) My.Log(msg);// Application DoEvents()
+            else
+            {
+                if (msg.Contains("Error")) color = Color.Red;
+                if (thistoolStripStatusLabel1 == null) { MessageBox.Show("Please add My.InitStatus(toolStripStatusLabel1) in your Form_Load event."); return; }
+                if (args.Length > 0) msg = String.Format(msg, args);
+                if (thistoolStripStatusLabel1.BackColor == SystemColors.Control || color == SystemColors.Control)
+                {
+                    thistoolStripStatusLabel1.Text = msg;
+                    thistoolStripStatusLabel1.BackColor = color ?? SystemColors.Control;
+                }
+                if (msg.Length > 0 && !msg.StartsWith(" ")) My.Log(msg);// Application DoEvents()
+            }
         }
 
         public static bool IsSetAttribute(FileSystemInfo fi, FileAttributes fileAttribute)
@@ -605,6 +619,23 @@ namespace MyLib
             thistoolStripStatusLabel1 = toolStripStatusLabel1;
             var t = toolStripStatusLabel1.GetCurrentParent();
             t.LayoutStyle = ToolStripLayoutStyle.Flow;
+        }
+        /// <summary>
+        /// Insert propertyValueChangedEventHandler at begin of eventlist so that it will fire first.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="newHandler"></param>
+        public static void InsertHandler(object obj, Action<object, PropertyValueChangedEventArgs> newHandler)
+        {
+            var bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetProperty;
+            var Events = obj?.GetType().GetProperty("Events", bf).GetValue(obj);
+            bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Static;
+            var head = Events.GetType().GetField("head", bf).GetValue(Events);
+            var handler = (PropertyValueChangedEventHandler)head.GetType().GetField("handler", bf).GetValue(head);
+            var pg = obj as PropertyGrid;
+            pg.PropertyValueChanged -= handler;
+            pg.PropertyValueChanged += new PropertyValueChangedEventHandler(newHandler);
+            pg.PropertyValueChanged += handler;
         }
     }
 }
