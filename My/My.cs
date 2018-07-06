@@ -361,7 +361,8 @@ namespace MyLib
             var parent = thistoolStripStatusLabel1.GetCurrentParent();
             // InvokeRequired required compares the thread ID of the  
             // calling thread to the thread ID of the creating thread.  
-            // If these threads are different, it returns true.  
+            // If these threads are different, it returns true. 
+            if (parent == null) return;
             if (parent.InvokeRequired)
             {
                parent.Invoke(new StringArgReturningVoidDelegate(Status), new object[] { msg, color, args });
@@ -376,7 +377,7 @@ namespace MyLib
                     thistoolStripStatusLabel1.Text = msg;
                     thistoolStripStatusLabel1.BackColor = color ?? SystemColors.Control;
                 }
-                if (msg.Length > 0 && !msg.StartsWith(" ")) My.Log(msg);// Application DoEvents()
+                if (msg.Length > 0 && !msg.StartsWith(" ")) My.Log(msg);
             }
         }
 
