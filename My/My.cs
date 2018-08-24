@@ -58,10 +58,10 @@ namespace MyLib
         /// <returns></returns>
         public static Dictionary<string, object> GetAllControls(Form form)
         {
-            var menuItems = new Dictionary<string, object>();
+            var menuItems = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             menuItems.Add(form.Name, form);
 
-            foreach (var c in GetAll(form)) if (c.Name.Length > 0 && c.Text.Length > 0) menuItems.Add(c.Name, c);
+            foreach (var c in GetAll(form)) if (IsValid(c)) menuItems.Add(c.Name, c);
             foreach (MenuStrip m in GetAll(form, typeof(MenuStrip)))
                 foreach (ToolStripMenuItem item in m.Items)
                 {
@@ -70,6 +70,14 @@ namespace MyLib
                         menuItems.Add(c.Name, c);
                 }
             return menuItems;
+        }
+
+        private static bool IsValid(Control c)
+        {
+            if (c.Name.Length == 0 || c.Text.Length == 0) return false;
+            if (c is NumericUpDown) return false;
+            if (c is ComboBox && (c as ComboBox).Items[0].GetType() != typeof(string)) return false;
+            return true;
         }
 
         public static string ExeFile { get; set; } = Path.GetFileNameWithoutExtension(ExeFullFile);
@@ -263,8 +271,11 @@ namespace MyLib
             return pin;
         }
         /// <summary>
-        /// To log all Console message:
-        /// 1) Open command window and run application piped to txt.log
+        /// Prefix message with datetime and append message to logfile. Default is executable directory. 
+        /// Message starting with Error: are show in dialog box.
+        /// 
+        /// To log Console message:
+        /// 1) Open command window and run application redirect output to txt.log
         /// 2) C:\YourExePath>application.exe > txt.log
         /// </summary>
         /// <param name="message"></param>
@@ -365,7 +376,7 @@ namespace MyLib
             if (parent == null) return;
             if (parent.InvokeRequired)
             {
-               parent.Invoke(new StringArgReturningVoidDelegate(Status), new object[] { msg, color, args });
+                parent.Invoke(new StringArgReturningVoidDelegate(Status), new object[] { msg, color, args });
             }
             else
             {
