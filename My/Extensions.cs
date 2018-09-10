@@ -11,7 +11,7 @@ namespace MyLib
 	public static class Extensions
 	{
 		/// <summary>
-		/// Compare two object if they are binary equal.
+		/// Compare two objects if they are binary equal.
 		/// Both objects are serialized to a byte array en then compared byte by byte.
 		/// </summary>
 		/// <param name="obj1"></param>
@@ -35,8 +35,8 @@ namespace MyLib
 		}
 		public static object DeepClone(this object obj)
 		{
-			object objResult = null;
 			if (obj == null) return null;
+			object objResult = null;
 			using (MemoryStream ms = new MemoryStream())
 			{
 				BinaryFormatter bf = new BinaryFormatter();
