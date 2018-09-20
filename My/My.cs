@@ -540,114 +540,119 @@ namespace MyLib
         public static string CombinePath(params string[] paths)
         {
             //test customVoicefiles for (int i = 1; i < paths.Length; i++) paths[i] = paths[i].Trim('\\');
-            var filename = Path.Combine(paths);
-            var path = Path.GetDirectoryName(filename);
-            if (path != "" && !Directory.Exists(path)) Directory.CreateDirectory(path);
-            return filename;
-        }
-        /// <summary>
-        /// Return a filename without invalid characters.
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        public static string ValidateFilename(string fileName)
-        {
-            return String.Concat(fileName.Split(Path.GetInvalidFileNameChars())).Trim().Replace(" ", "_");
-        }
-        /// <summary>
-        /// Invoke a class private methode. Can be used during unittesting.
-        /// </summary>
-        /// <param name="classInstance">The object on which to invoke the method or constructor. If a method is static, this argument is ignored.</param>
-        /// <param name="methodeName"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
-        public static object Invoke(object classInstance, string methodeName, params object[] parameters)
-        {
-            var bf = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod;
-            if (classInstance == null) bf |= BindingFlags.Static;
-            var m = classInstance?.GetType().GetMethod(methodeName, bf);
-            var r = m?.Invoke(classInstance, parameters);
-            return r;
-        }
-        /// <summary>
-        /// Return a private or static field. Can be used during unittesting.
-        /// </summary>
-        /// <param name="obj">The object from which to retrieve the field.</param>
-        /// <param name="fieldname">The name of the field to retrieve.</param>
-        /// <returns></returns>
-        public static object GetField(object obj, string fieldname)
-        {
-            var bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static;
-            return obj?.GetType().GetField(fieldname, bf)?.GetValue(obj);
-        }
-        /// <summary>
-        /// Linear interpolation. https://en.wikipedia.org/wiki/Linear_interpolation
-        /// This function returns a value between V0 and V1 dependant on value t [0 - 1].
-        /// </summary>
-        /// <param name="t between 0 and 1"></param>
-        /// <param name="V0"></param>
-        /// <param name="V1"></param>
-        /// <returns></returns>
-        public static float Lerp(float t, float V0, float V1) => V0 + t * (V1 - V0);
-        /// <summary>
-        /// This function returns a value between 0 and 1 dependant on value t [V0 - V1] 
-        /// </summary>
-        /// <param name="t value between V0 and V1."></param>
-        /// <param name="V0"></param>
-        /// <param name="V1"></param>
-        /// <returns></returns>
-        public static float InverseLerp(float t, float V0, float V1) => (t - V0) / (V1 - V0);
-        /// <summary>
-        /// Extension methode which iterates thrue each control on a form. 
-        /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="action"></param>
-        public static void ForAllControls(this Control parent, Action<Control> action)
-        {
-            foreach (Control c in parent.Controls)
+            try
             {
-                action(c);
-                ForAllControls(c, action);
+                var filename = Path.Combine(paths);
+                var path = Path.GetDirectoryName(filename);
+                if (path != "" && !Directory.Exists(path)) Directory.CreateDirectory(path);
+                return filename;
+            }
+            catch (Exception ee) { My.Status(ee.Message); return null; }
+        }
+
+            /// <summary>
+            /// Return a filename without invalid characters.
+            /// </summary>
+            /// <param name="fileName"></param>
+            /// <returns></returns>
+            public static string ValidateFilename(string fileName)
+            {
+                return String.Concat(fileName.Split(Path.GetInvalidFileNameChars())).Trim().Replace(" ", "_");
+            }
+            /// <summary>
+            /// Invoke a class private methode. Can be used during unittesting.
+            /// </summary>
+            /// <param name="classInstance">The object on which to invoke the method or constructor. If a method is static, this argument is ignored.</param>
+            /// <param name="methodeName"></param>
+            /// <param name="parameters"></param>
+            /// <returns></returns>
+            public static object Invoke(object classInstance, string methodeName, params object[] parameters)
+            {
+                var bf = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod;
+                if (classInstance == null) bf |= BindingFlags.Static;
+                var m = classInstance?.GetType().GetMethod(methodeName, bf);
+                var r = m?.Invoke(classInstance, parameters);
+                return r;
+            }
+            /// <summary>
+            /// Return a private or static field. Can be used during unittesting.
+            /// </summary>
+            /// <param name="obj">The object from which to retrieve the field.</param>
+            /// <param name="fieldname">The name of the field to retrieve.</param>
+            /// <returns></returns>
+            public static object GetField(object obj, string fieldname)
+            {
+                var bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static;
+                return obj?.GetType().GetField(fieldname, bf)?.GetValue(obj);
+            }
+            /// <summary>
+            /// Linear interpolation. https://en.wikipedia.org/wiki/Linear_interpolation
+            /// This function returns a value between V0 and V1 dependant on value t [0 - 1].
+            /// </summary>
+            /// <param name="t between 0 and 1"></param>
+            /// <param name="V0"></param>
+            /// <param name="V1"></param>
+            /// <returns></returns>
+            public static float Lerp(float t, float V0, float V1) => V0 + t * (V1 - V0);
+            /// <summary>
+            /// This function returns a value between 0 and 1 dependant on value t [V0 - V1] 
+            /// </summary>
+            /// <param name="t value between V0 and V1."></param>
+            /// <param name="V0"></param>
+            /// <param name="V1"></param>
+            /// <returns></returns>
+            public static float InverseLerp(float t, float V0, float V1) => (t - V0) / (V1 - V0);
+            /// <summary>
+            /// Extension methode which iterates thrue each control on a form. 
+            /// </summary>
+            /// <param name="parent"></param>
+            /// <param name="action"></param>
+            public static void ForAllControls(this Control parent, Action<Control> action)
+            {
+                foreach (Control c in parent.Controls)
+                {
+                    action(c);
+                    ForAllControls(c, action);
+                }
+            }
+            /// <summary>
+            /// This function retuns all controls of a specific type.
+            /// example: var c = GetAll(this,typeof(TextBox));
+            /// </summary>
+            /// <param name="control"></param>
+            /// <param name="type"></param>
+            /// <returns></returns>
+            public static IEnumerable<Control> GetAll(Control control, Type type = null)
+            {
+                var controls = control.Controls.Cast<Control>();
+
+                return controls.SelectMany(ctrl => GetAll(ctrl, type))
+                                          .Concat(controls)
+                                          .Where(c => c.GetType() == type || type == null);
+            }
+
+            public static void InitializeStatus(ToolStripStatusLabel toolStripStatusLabel1)
+            {
+                thistoolStripStatusLabel1 = toolStripStatusLabel1;
+                var t = toolStripStatusLabel1.GetCurrentParent();
+                t.LayoutStyle = ToolStripLayoutStyle.Flow;
+            }
+            /// <summary>
+            /// Insert propertyValueChangedEventHandler at begin of eventlist so that it will fire first.
+            /// </summary>
+            /// <param name="obj"></param>
+            /// <param name="newHandler"></param>
+            public static void InsertHandler(object obj, Action<object, PropertyValueChangedEventArgs> newHandler)
+            {
+                var bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetProperty;
+                var Events = obj?.GetType().GetProperty("Events", bf).GetValue(obj);
+                bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Static;
+                var head = Events.GetType().GetField("head", bf).GetValue(Events);
+                var handler = (PropertyValueChangedEventHandler)head.GetType().GetField("handler", bf).GetValue(head);
+                var pg = obj as PropertyGrid;
+                pg.PropertyValueChanged -= handler;
+                pg.PropertyValueChanged += new PropertyValueChangedEventHandler(newHandler);
+                pg.PropertyValueChanged += handler;
             }
         }
-        /// <summary>
-        /// This function retuns all controls of a specific type.
-        /// example: var c = GetAll(this,typeof(TextBox));
-        /// </summary>
-        /// <param name="control"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static IEnumerable<Control> GetAll(Control control, Type type = null)
-        {
-            var controls = control.Controls.Cast<Control>();
-
-            return controls.SelectMany(ctrl => GetAll(ctrl, type))
-                                      .Concat(controls)
-                                      .Where(c => c.GetType() == type || type == null);
-        }
-
-        public static void InitializeStatus(ToolStripStatusLabel toolStripStatusLabel1)
-        {
-            thistoolStripStatusLabel1 = toolStripStatusLabel1;
-            var t = toolStripStatusLabel1.GetCurrentParent();
-            t.LayoutStyle = ToolStripLayoutStyle.Flow;
-        }
-        /// <summary>
-        /// Insert propertyValueChangedEventHandler at begin of eventlist so that it will fire first.
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="newHandler"></param>
-        public static void InsertHandler(object obj, Action<object, PropertyValueChangedEventArgs> newHandler)
-        {
-            var bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetProperty;
-            var Events = obj?.GetType().GetProperty("Events", bf).GetValue(obj);
-            bf = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Static;
-            var head = Events.GetType().GetField("head", bf).GetValue(Events);
-            var handler = (PropertyValueChangedEventHandler)head.GetType().GetField("handler", bf).GetValue(head);
-            var pg = obj as PropertyGrid;
-            pg.PropertyValueChanged -= handler;
-            pg.PropertyValueChanged += new PropertyValueChangedEventHandler(newHandler);
-            pg.PropertyValueChanged += handler;
-        }
     }
-}
