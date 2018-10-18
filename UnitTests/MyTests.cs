@@ -76,7 +76,7 @@ namespace UnitTests
 		public void ValidateFilenameTest()
 		{
 			var invalid = @"//filename ""with \\valid characters?";
-			var valid = @"filename with valid characters";
+			var valid = @"filename_with_valid_characters";
 			var res = My.ValidateFilename(invalid);
 			Assert.IsTrue(res == valid, "filename contains invalid characters.");
 		}
@@ -101,5 +101,13 @@ namespace UnitTests
 			r = My.InverseLerp(20f, V0, V1);
 			Assert.IsTrue(r == 1, $"InverseLerp should be 1 {r}");
 		}
+
+		[TestMethod]
+        public void VersionTest()
+        {
+            var expected = " V1.2.3";
+            var v = My.Version;
+            Assert.IsTrue(v == expected, $"Invalid version {v} should be {expected}");
+        }
 	}
 }
