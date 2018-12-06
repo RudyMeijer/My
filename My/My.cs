@@ -49,18 +49,34 @@ namespace MyLib
         private static string GetVersion()
         {
             var x = Assembly.GetEntryAssembly();
-            if (x == null) return " V= test";
-            var v = Assembly.GetEntryAssembly().GetName().Version;
-            if (v == null) return " V= null";
+            if (x == null) x = Assembly.GetCallingAssembly();
+            if (x == null) return " V=test";
+            var v = x.GetName().Version;
+            if (v == null) return " V=null";
             var versionString = $" V{v.Major}.{v.Minor}.{v.Build}";
             return versionString;
         }
 
         private static string ExeFullFile = Application.ExecutablePath; //// examen: System.Reflection.Assembly.GetEntryAssembly().FullName.Split(',')[0];
         public static string ExePath { get; set; } = Path.GetDirectoryName(ExeFullFile) + "\\";
-        public static T GetEnum<T>(string value)
+        public static T GetEnum<T>(string text)
         {
-            return (T)Enum.Parse(typeof(T), value, true);
+            ////Enum.TryParse<T>(value, out T result);
+            ////{
+            ////    return result;
+            ////}
+            try
+            {
+                return (T)Enum.Parse(typeof(T), text, true);
+            }
+            catch (Exception)
+            {
+                return default(T);
+            }
+        }
+        public static T GetEnumByIndex<T>(int index)
+        {
+            return (T)Enum.ToObject(typeof(T), index);
         }
 
         /// <summary>
@@ -365,8 +381,8 @@ namespace MyLib
         public static DialogResult Show(string msg, string title = null, MessageBoxButtons buttons = MessageBoxButtons.OK)
         {
             if (title == null) title = $"Dear mr {My.UserName}";
-            My.Log($"Show {title}: {msg}");
             var res = MessageBox.Show(msg, title, buttons);
+            My.Log($"Show {title}: {msg}");
             My.Log($"{res} entered by {My.UserName}.");
             return res;
         }

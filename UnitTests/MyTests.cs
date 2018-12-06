@@ -109,5 +109,24 @@ namespace UnitTests
             var v = My.Version;
             Assert.IsTrue(v == expected, $"Invalid version {v} should be {expected}");
         }
-	}
+
+        [TestMethod]
+        public void EnumTest()
+        {
+            var expected = 1;
+            var v = (int)My.GetEnum<MyEnum>("Yes");
+            Assert.IsTrue(v == 1, $"Invalid enum {v} should be {expected}");
+
+            v = (int)My.GetEnum<MyEnum>("xxx");
+            Assert.IsTrue(v == 0, $"Invalid enum {v} should be {expected}");
+
+            MyEnum name = My.GetEnumByIndex<MyEnum>(1);
+            Assert.IsTrue(name.ToString() == "Yes", $"Invalid enum {name} should be Yes.");
+        }
+        enum MyEnum
+        {
+            No,
+            Yes
+        }
+    }
 }
