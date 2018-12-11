@@ -45,8 +45,9 @@ namespace MyLib
         public static Char DecimalSeparator { get; set; } = NumberFormatInfo.CurrentInfo.NumberDecimalSeparator[0];
         //public static string Version { get; set; } = " V" + Application.ProductVersion.Substring(0, Application.ProductVersion.LastIndexOf('.'));
         public static string Version { get { return GetVersion(); } }
+        public static string Revision { get { return GetVersion(true); } }
 
-        private static string GetVersion()
+        private static string GetVersion(bool revision=false)
         {
             var x = Assembly.GetEntryAssembly();
             if (x == null) x = Assembly.GetCallingAssembly();
@@ -54,6 +55,7 @@ namespace MyLib
             var v = x.GetName().Version;
             if (v == null) return " V=null";
             var versionString = $" V{v.Major}.{v.Minor}.{v.Build}";
+            if (revision) versionString = $"{v.Revision}";
             return versionString;
         }
 
