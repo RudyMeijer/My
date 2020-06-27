@@ -54,6 +54,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetDir) C:\Projects\route66\Route66\Assemblies\</PostBuildEvent>
+    <PostBuildEvent>rem copy $(TargetDir) C:\Projects\route66\Route66\Assemblies\</PostBuildEvent>
   </PropertyGroup>
 </Project>

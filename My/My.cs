@@ -308,8 +308,7 @@ namespace MyLib
         }
         private static string GetPin(string drive)
         {
-            uint v = 103; //V103
-            uint sn = v + VolumeSerialNumber(drive);
+            uint sn = VolumeSerialNumber(drive) + 103; // V103
             uint n = (uint)(sn ^ -1);
             string pin = (n & 0xffffuL).ToString("X4");
             return pin;
